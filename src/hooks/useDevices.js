@@ -26,7 +26,6 @@ export function useDevices(token) {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
-    // refetch via socket event, el servidor emite devices:update
   };
 
   const updateDevice = async (id, name) => {
