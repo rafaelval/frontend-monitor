@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { io } from "socket.io-client";
-const API = import.meta.env.VITE_API_URL;
 
 export function useDevices(token) {
   const [devices, setDevices] = useState([]);
@@ -9,7 +8,7 @@ export function useDevices(token) {
     if (!token) return;
 
     const fetchDevices = async () => {
-      const res = await fetch(`${API}/devices`, {
+      const res = await fetch("http://localhost:3000/devices", {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) setDevices(await res.json());
@@ -17,20 +16,21 @@ export function useDevices(token) {
 
     fetchDevices();
 
-    const socket = io(API);
+    const socket = io("http://localhost:3000");
     socket.on("devices:update", fetchDevices);
     return () => socket.disconnect();
   }, [token]);
 
   const deleteDevice = async (id) => {
-    await fetch(`${API}/devices/${id}`, {
+    await fetch(`http://localhost:3000/devices/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
+    // refetch via socket event, el servidor emite devices:update
   };
 
   const updateDevice = async (id, name) => {
-    await fetch(`${API}/devices/${id}`, {
+    await fetch(`http://localhost:3000/devices/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -42,4 +42,3 @@ export function useDevices(token) {
 
   return { devices, deleteDevice, updateDevice };
 }
-

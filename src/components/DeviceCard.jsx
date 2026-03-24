@@ -1,9 +1,14 @@
 function connect(device) {
+  const url = `rustdesk://connect/${device.rustdesk_id}?password=${device.password}`;
+  
   const iframe = document.createElement("iframe");
   iframe.style.display = "none";
-  iframe.src = `rustdesk://connect/${device.rustdesk_id}?password=${device.password}`;
+  iframe.src = url;
   document.body.appendChild(iframe);
-  setTimeout(() => document.body.removeChild(iframe), 2000);
+
+  setTimeout(() => {
+    document.body.removeChild(iframe);
+  }, 2000);
 }
 
 export default function DeviceCard({ device, onDelete, onUpdate }) {
