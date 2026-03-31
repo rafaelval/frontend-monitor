@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { useAuth } from "./hooks/useAuth";
 import { useDevices } from "./hooks/useDevices";
 import LoginForm from "./components/LoginForm";
@@ -8,45 +7,41 @@ import DeviceCard from "./components/DeviceCard";
 function App() {
   const { token, loading, login, logout } = useAuth();
   const { devices, deleteDevice, updateDevice } = useDevices(token);
-  const [serverStatus, setServerStatus] = useState("checking");
-
-  useEffect(() => {
-    const check = async () => {
-      try {
-        const res = await fetch("http://localhost:3000/server-status");
-        if (!res.ok) return setServerStatus("offline");
-        const data = await res.json();
-        setServerStatus(data.status);
-      } catch {
-        setServerStatus("offline");
-      }
-    };
-
-    check();
-    const interval = setInterval(check, 5000);
-    return () => clearInterval(interval);
-  }, []);
 
   if (!token) return <LoginForm onLogin={login} loading={loading} />;
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Navbar serverStatus={serverStatus} onLogout={logout} />
-      <div className="p-6">
-        <h2 className="text-lg font-semibold mb-4">Equipos conectados</h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          {devices.map((device) => (
-            <DeviceCard
-              key={device.id}
-              device={device}
-              onDelete={deleteDevice}
-              onUpdate={updateDevice}
-            />
-          ))}
-        </div>
+  <div style={{ minHeight: "100vh", background: "#0a0a0f" }}>
+    <Navbar onLogout={logout} />
+    <div style={{ padding: "32px" }}>
+      <div style={{ marginBottom: "24px", display: "flex", alignItems: "center", gap: "12px" }}>
+        <span style={{
+          fontFamily: "'JetBrains Mono', monospace",
+          color: "#00ff88", fontSize: "10px", letterSpacing: "3px"
+        }}>
+          ▸ EQUIPOS CONECTADOS
+        </span>
+        <div style={{ flex: 1, height: "1px", background: "rgba(0,255,136,0.1)" }} />
+        <span style={{
+          fontFamily: "'JetBrains Mono', monospace",
+          color: "#333", fontSize: "10px"
+        }}>
+          {devices.length} dispositivos
+        </span>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px" }}>
+        {devices.map((device) => (
+          <DeviceCard
+            key={device.id}
+            device={device}
+            onDelete={deleteDevice}
+            onUpdate={updateDevice}
+          />
+        ))}
       </div>
     </div>
-  );
+  </div>
+);
 }
 
 export default App;

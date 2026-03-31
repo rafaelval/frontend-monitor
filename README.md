@@ -1,16 +1,74 @@
-# React + Vite
+# Monitoring Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Panel de monitoreo en tiempo real para gestionar y acceder remotamente a equipos via RustDesk.
 
-Currently, two official plugins are available:
+## Demo
+[▶ Ver demo en video](https://loom.com/tu-link)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Stack
+- **Frontend:** React + Tailwind CSS + Vite
+- **Backend:** Node.js + Express + Socket.io
+- **Base de datos y auth:** Supabase
+- **Conexión remota:** RustDesk 
 
-## React Compiler
+## Arquitectura
+```
+Agente (register.js) → heartbeat cada 10s
+        ↓
+Backend (Express + Socket.io)
+        ↓ tiempo real
+Frontend (React) → deep link rustdesk://
+        ↓
+RustDesk (PC del técnico)
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Features
+- Autenticación segura con Supabase
+- Dispositivos en tiempo real con Socket.io
+- Conexión remota con un click via deep link
+- Agente que se registra y reporta estado automáticamente
+- El panel detecta cuando un equipo se desconecta en menos de 15s
+- Eliminación de dispositivos con confirmación desde el agente
 
-## Expanding the ESLint configuration
+## Correr el proyecto localmente
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Requisitos
+- Node.js 18+
+- Cuenta en Supabase
+- RustDesk instalado
+
+### Backend
+```bash
+cd backend
+npm install
+# crea un .env con:
+# SUPABASE_URL=...
+# SUPABASE_KEY=...
+node index.js
+```
+
+### Frontend
+```bash
+cd frontend
+npm install
+# crea un .env con:
+# VITE_API_URL=http://localhost:3000
+npm run dev
+```
+
+### Agente (en cada PC cliente)
+```bash
+cd agent
+npm install
+node register.js
+```
+
+## Estructura
+```
+├── frontend/         # React app
+│   ├── src/
+│   │   ├── hooks/        # useAuth, useDevices
+│   │   └── components/   # Navbar, DeviceCard, LoginForm
+├── backend/          # Express + Socket.io
+└── agent/            # register.js para PCs clientes
+```
